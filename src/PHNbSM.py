@@ -1,13 +1,11 @@
 # Persian Handwritten Number Recognition by Sequences Matching -> PHNbSM
 # first need to read dataset
-import cv2
-import numpy as np
-import pandas
-from dtw import dtw
+
+from DTWHandler import DTWHandler
 from DataCollector import DataCollector
 from Extractor import Extractor
 from OutputWriter import OutputWriter
-import matplotlib.pyplot as plt
+
 
 class PHNbSM:
     log = False
@@ -37,36 +35,59 @@ class PHNbSM:
                 img_writer.imageWriter(self.dc.X_naming[i], self.dc.Y_naming[i], 'naming')
                 if i > 100:
                     break
-
+        # TODO: Uncomment Train And Namely Lines in Data Collector
+        # TODO: Change here Test With Train
         extactor = Extractor(self.dc)
-        aida = extactor.getXTestEdgeVector()
-        # alignment = dtw(aida[0], aida[1], keep_internals=True)
-        # alignment.plot(type="threeway")
-        mim = []
-        for data in aida:
+        extracted_test = extactor.getXTestEdgeVector()
+        prepared_model = self.modelCreator(extracted_test, self.dc.Y_test)
+        # print(len(prepared_model))
+
+        test_data = self.dataCreator(extracted_test)
+        test_data = test_data[0:1]
+        test_label = self.dc.Y_test[0:1]
+        dtwHandler = DTWHandler(prepared_model, test_data, test_label)
+        dtwHandler.fit()
+        # dtwHandler.predict()
+        dtwHandler.printResult()
+
+        # aida_1 = pandas.Series(mim[4500])
+        # aida_2 = pandas.Series(mim[4600])
+        # # manhattan_distance = lambda a, b: (abs(a[0] - b[0]) + abs(a[1] - b[1]))
+        # manhattan_distance = lambda a, b: abs(a - b)
+        #
+        # d, cost_matrix, acc_cost_matrix, path = dtw(aida_1, aida_2, dist=manhattan_distance)
+        #
+        # # fig, axs = plt.subplots(3)
+        # print(d)
+        # plt.imshow(self.dc.X_test[4500].reshape([32, 32]), cmap='gray')
+        # plt.show()
+        # plt.imshow(self.dc.X_test[4600].reshape([32, 32]), cmap='gray')
+        # plt.show()
+        # plt.imshow(acc_cost_matrix.T, origin='lower', cmap='gray', interpolation='nearest')
+        # # plt.show()
+        # plt.plot(path[0], path[1], 'w')
+        # plt.show()
+        # plt.close('all')
+
+    def modelCreator(self, extracted_data, labels):
+        row_wise_data = []
+        for i in range(len(extracted_data)):
+            data = extracted_data[i]
             row_wise = []
             for itm in data:
                 row_wise.append(itm[0] * 32 + itm[1])
-            mim.append(row_wise)
-        print(mim[0])
-        aida_1 = pandas.Series(mim[0])
-        aida_2 = pandas.Series(mim[0])
-        manhattan_distance = lambda x, y: np.abs(x - y)
+            row_wise_data.append([row_wise, labels[i]])
+        return row_wise_data
 
-
-        d, cost_matrix, acc_cost_matrix, path = dtw(aida_1,aida_2, dist=manhattan_distance)
-
-        # fig, axs = plt.subplots(3)
-        plt.imshow(self.dc.X_test[0].reshape([32, 32]), cmap='gray')
-        plt.show()
-        plt.imshow(self.dc.X_test[0].reshape([32, 32]), cmap='gray')
-        plt.show()
-        plt.imshow(acc_cost_matrix.T, origin='lower', cmap='gray', interpolation='nearest')
-        # plt.show()
-        plt.plot(path[0], path[1], 'w')
-        plt.show()
-
-
+    def dataCreator(self, extracted_data):
+        row_wise_data = []
+        for i in range(len(extracted_data)):
+            data = extracted_data[i]
+            row_wise = []
+            for itm in data:
+                row_wise.append(itm[0] * 32 + itm[1])
+            row_wise_data.append(row_wise)
+        return row_wise_data
 
 
 if __name__ == '__main__':
