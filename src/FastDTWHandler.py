@@ -5,8 +5,7 @@ from dtw import *
 from sklearn.neighbors import KNeighborsClassifier as KNNClassifier
 
 
-
-class DTWHandler:
+class FastDTWHandler:
     train_x = []
     train_y = []
 
@@ -30,6 +29,7 @@ class DTWHandler:
         self.test_x = test_x
         self.test_y = test_y
         self.model = model
+        self.test_x = self.filler(test_x)
         self.extract_XY()
         self.test_x = self.filler(test_x)
         n_neighbors = 20
@@ -45,6 +45,84 @@ class DTWHandler:
                                  metric=DTW_Distance
                                  # metric_params={"func": DTW_Distance}
                                  )
+        data = self.trainDataSeparator()
+        self.modelCreator(data)
+        data, labels = self.modelExtractor(1)
+        self.train_x = data
+        self.train_y = labels
+        # for key, value in data.items():
+        #     print(' len of {} is : {}'.format(key, len(value)))
+
+    def trainDataSeparator(self):
+        data = dict()
+        for i in range(len(self.train_x)):
+            data_list = []
+            i_key = str(int(self.train_y[i]))
+            if i_key in data:
+                data_list = data.get(i_key)
+            data_list.append(self.train_x[i])
+            data[i_key] = data_list
+        return data
+
+    def modelCreator(self, data):
+        first_layer = {}
+        second_layer = {}
+
+        for key, value in data.items():
+            total = np.array(value)
+            total[total == -1] = 0
+
+            # --------= first Layer
+            first_separation_coefficient = 100
+            first = np.split(total, first_separation_coefficient, axis=0)
+            first = np.array(first)
+            sub_sec_arr = []
+            for i in range(first_separation_coefficient):
+                # temp_arr = first[i].mean(0)
+                index = np.random.choice(first[i].shape[0], 1, replace=False)[0]
+                temp_arr = first[i][index]
+                temp_arr[temp_arr == 0] = -1
+                sub_sec_arr.append(temp_arr)
+            first_layer[key] = sub_sec_arr
+            # --------= Second Layer
+            second_separation_coefficient = 1000
+            second = np.split(total, second_separation_coefficient, axis=0)
+            second = np.array(second)
+            sub_sec_arr = []
+            for i in range(second_separation_coefficient):
+                # temp_arr = second[i].mean(0)
+                index = np.random.choice(second[i].shape[0], 1, replace=False)[0]
+                temp_arr = second[i][index]
+                temp_arr[temp_arr == 0] = -1
+                sub_sec_arr.append(temp_arr)
+            second_layer[key] = sub_sec_arr
+        self.model = {
+            'first': first_layer,
+            'second': second_layer
+        }
+
+    def modelExtractor(self, layer=1):
+        labels = np.array([])
+        data = np.array([])
+        if layer == 1:
+            origin_data = self.model.get('first')
+        else:
+            origin_data = self.model.get('second')
+
+        for key, value in origin_data.items():
+            value = np.array(value)
+            partial_labels = [key] * value.shape[0]
+            partial_labels = np.array(partial_labels)
+
+            if len(labels) <= 0:
+                labels = partial_labels
+            if len(data) <= 0:
+                data = value
+
+            data = np.concatenate((data, value), axis=0)
+            labels = np.concatenate((labels, partial_labels), axis=0)
+
+        return data, labels
 
     def extract_XY(self):
         self.train_x = []
@@ -84,28 +162,22 @@ class DTWHandler:
         self.test_x = balanced_array
         return self.test_x
 
-    def fit(self):
-        print('\tFit Start ...')
+    def fit(self, train_x, train_y):
         self.st_tr_time = datetime.datetime.now().timestamp()
-        self.clf.fit(self.train_x, self.train_y)
+        self.clf.fit(train_x, train_y)
         self.en_tr_time = datetime.datetime.now().timestamp()
-        print('\tFit Finished ...')
 
-    def predict(self):
-
-        print('\tPredict Start ... {}'.format(len(self.train_x)))
+    def predict(self, test_x):
         self.st_te_time = datetime.datetime.now().timestamp()
-        self.labels_predict = self.clf.predict(self.test_x)
+        self.labels_predict = self.clf.predict(test_x)
         self.en_te_time = datetime.datetime.now().timestamp()
-        print('\tPredict Finished ...')
-        print(self.labels_predict)
         return self.labels_predict
 
     def getAccuracy(self):
         if len(self.labels_predict) == 0:
-            self.predict()
+            self.predict(self.test_x)
         for i in range(len(self.labels_predict)):
-            if self.labels_predict[i] == self.test_y[i]:
+            if int(self.labels_predict[i]) == int(self.test_y[i]):
                 self.currect += 1
         return (self.currect / len(self.test_y)) * 100
 
@@ -117,8 +189,9 @@ class DTWHandler:
 
     def printResult(self):
         if len(self.labels_predict) == 0:
-            self.fit()
-            self.predict()
+            self.fit(self.train_x, self.train_y)
+            self.predict(self.test_x)
+            self.getAccuracy()
         print("\t+-----=[ DTW Result ]=----- ")
         print("\t| Train Time         : {}".format(self.trainTime()))
         print("\t| Test  Time         : {}".format(self.testTime()))
