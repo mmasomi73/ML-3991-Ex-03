@@ -2,6 +2,7 @@ import datetime
 
 import numpy as np
 from dtw import *
+import pandas as pd
 from sklearn.neighbors import KNeighborsClassifier as KNNClassifier
 
 
@@ -23,7 +24,7 @@ class FastDTWHandler:
 
     labels_predict = []
 
-    knnDwt = object
+    misclassify = []
 
     def __init__(self, model, test_x, test_y):
         self.test_x = test_x
@@ -179,6 +180,8 @@ class FastDTWHandler:
         for i in range(len(self.labels_predict)):
             if int(self.labels_predict[i]) == int(self.test_y[i]):
                 self.currect += 1
+            else:
+                self.misclassify.append([int(self.labels_predict[i]), int(self.test_y[i])])
         return (self.currect / len(self.test_y)) * 100
 
     def trainTime(self):
@@ -192,9 +195,37 @@ class FastDTWHandler:
             self.fit(self.train_x, self.train_y)
             self.predict(self.test_x)
             self.getAccuracy()
+        misclassify = pd.DataFrame(self.misclassify)
+        misclassify = misclassify.groupby(misclassify.columns.tolist(), as_index=False).size()
+        misclassify = misclassify.to_numpy()
         print("\t+-----=[ DTW Result ]=----- ")
+        print("\t| Train Data Size    : {}".format(len(self.train_x)))
+        print("\t| Test  Data Size    : {}".format(len(self.test_x)))
         print("\t| Train Time         : {}".format(self.trainTime()))
         print("\t| Test  Time         : {}".format(self.testTime()))
         print("\t| Accuracy           : {}".format((self.currect / len(self.test_y)) * 100))
-        print("\t| MissClassification : {}".format(((len(self.test_y) - self.currect) / len(self.test_y)) * 100))
+        print("\t| MisClassification : {}".format(((len(self.test_y) - self.currect) / len(self.test_y)) * 100))
+        if misclassify.shape[0] > 0:
+            print("\t| Most MisClassification ")
+            print("\t|\t [Predict - Actual] -> [ # ] ")
+            for i in range(misclassify.shape[0]):
+                print("\t|\t [   {}   -   {}   ] -> [ {} ] ".format(misclassify[i, 0],
+                                                                    misclassify[i, 1],
+                                                                    misclassify[i, 2]))
         print("\t------------------------------------------- ")
+
+        file_name = '../outs/outputs.csv'
+        file = open(file_name, "w+")
+        file.write('Train Data Size,{}\n'.format(len(self.train_x)))
+        file.write('Test  Data Size,{}\n'.format(len(self.test_x)))
+        file.write('Train Time,{}\n'.format(self.trainTime()))
+        file.write('Test  Time,{}\n'.format(self.testTime()))
+        file.write('Accuracy,{}\n'.format((self.currect / len(self.test_y)) * 100))
+        file.write('MisClassification,{}\n'.format(((len(self.test_y) - self.currect) / len(self.test_y)) * 100))
+        if misclassify.shape[0] > 0:
+            file.write(",Predict, Actual,#\n")
+            for i in range(misclassify.shape[0]):
+                file.write(",{},{},{}".format(misclassify[i, 0],
+                                              misclassify[i, 1],
+                                              misclassify[i, 2]))
+        file.close()
