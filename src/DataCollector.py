@@ -25,7 +25,7 @@ class DataCollector:
             print(Fore.GREEN + "\t+----------------------------------------------")
             print(Fore.GREEN + "\tRead Dataset Begin.")
 
-        self.X_train, self.Y_train = self.dataSetReader(self.train_dataset_path)
+        # self.X_train, self.Y_train = self.dataSetReader(self.train_dataset_path)
         self.X_test, self.Y_test = self.dataSetReader(self.test_dataset_path)
         # self.X_naming, self.Y_naming = self.dataSetReader(self.naming_dataset_path)
 

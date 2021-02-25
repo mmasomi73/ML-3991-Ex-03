@@ -8,6 +8,7 @@ from DataCollector import DataCollector
 from Extractor import Extractor
 from FastDTWHandler import FastDTWHandler
 from OutputWriter import OutputWriter
+from Visualizer import Visualizer
 
 
 class PHNbSM:
@@ -49,8 +50,11 @@ class PHNbSM:
         # dtwHandler = DTWHandler(prepared_model, test_data, test_label)
         # dtwHandler.printResult()
 
-        dtwHandler = FastDTWHandler(prepared_model, test_data, test_label)
-        dtwHandler.printResult()
+        # dtwHandler = FastDTWHandler(prepared_model, test_data, test_label)
+        # dtwHandler.printResult()
+
+        visualizer = Visualizer(self.dc.X_test, self.dc.Y_test)
+        visualizer.drawCompares()
 
     def modelCreator(self, extracted_data, labels):
         row_wise_data = []
