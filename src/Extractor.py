@@ -13,14 +13,6 @@ class Extractor:
     def __init__(self, dc, filter='canny'):
         self.dc = dc
         self.filter = filter
-        # img_writer = OutputWriter()
-        # for i in range(len(dc.X_test)):
-        #     img = dc.X_test[i].reshape([32, 32])
-        #     img = np.uint8(img)
-        #     edges = cv2.Canny(img, 1, 1)
-        #     img_writer.imageWriter(edges, dc.Y_test[i], 'aida')
-        #     if i >= 1:
-        #         break
 
     def getXTrainEdgeVector(self):
         return self.getEdgeVector(self.dc.X_train)

@@ -7,7 +7,6 @@ class OutputWriter:
     train_img_path = '../outs/train/'
     test_img_path = '../outs/test/'
     naming_img_path = '../outs/naming/'
-    aida = '../outs/aida/'
 
     def __init__(self):
         print('Hello')
@@ -38,8 +37,6 @@ class OutputWriter:
             base_path = self.test_img_path
         elif imgType == 'naming':
             base_path = self.naming_img_path
-        elif imgType == 'aida':
-            base_path = self.aida
         else:
             print("\tError in image data type")
             return

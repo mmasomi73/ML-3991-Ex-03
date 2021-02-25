@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from DTWHandler import DTWHandler
 from DataCollector import DataCollector
+from Evaluator import Evaluator
 from Extractor import Extractor
 from FastDTWHandler import FastDTWHandler
 from OutputWriter import OutputWriter
@@ -78,9 +79,12 @@ class PHNbSM:
         # dtwHandler = FastDTWHandler(prepared_model, test_data, test_label)
         # dtwHandler.printResult()
 
-        visualizer = Visualizer(self.dc.X_test, self.dc.Y_test, self.dc)
-        visualizer.drawSequences()
+        # visualizer = Visualizer(self.dc.X_test, self.dc.Y_test, self.dc)
+        # visualizer.drawSequences()
         # visualizer.drawCompares()
+        #
+        evaluator = Evaluator(self.dc, True)
+        evaluator.preprocessTimer()
 
 
 if __name__ == '__main__':
