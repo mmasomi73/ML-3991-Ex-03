@@ -84,7 +84,8 @@ class PHNbSM:
         # visualizer.drawCompares()
         #
         evaluator = Evaluator(self.dc, True)
-        evaluator.preprocessTimer()
+        # evaluator.preprocessTimer()
+        evaluator.timeEstimator()
 
 
 if __name__ == '__main__':

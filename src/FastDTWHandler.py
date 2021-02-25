@@ -214,7 +214,7 @@ class FastDTWHandler:
                                                                     misclassify[i, 2]))
         print("\t------------------------------------------- ")
 
-        file_name = '../outs/outputs.csv'
+        file_name = '../outs/outputs-temp.csv'
         file = open(file_name, "w+")
         file.write('Train Data Size,{}\n'.format(len(self.train_x)))
         file.write('Test  Data Size,{}\n'.format(len(self.test_x)))
@@ -225,7 +225,7 @@ class FastDTWHandler:
         if misclassify.shape[0] > 0:
             file.write(",Predict, Actual,#\n")
             for i in range(misclassify.shape[0]):
-                file.write(",{},{},{}".format(misclassify[i, 0],
-                                              misclassify[i, 1],
-                                              misclassify[i, 2]))
+                file.write(",{},{},{}\n".format(misclassify[i, 0],
+                                                misclassify[i, 1],
+                                                misclassify[i, 2]))
         file.close()

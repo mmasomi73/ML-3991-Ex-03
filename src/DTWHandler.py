@@ -98,7 +98,6 @@ class DTWHandler:
         self.labels_predict = self.clf.predict(self.test_x)
         self.en_te_time = datetime.datetime.now().timestamp()
         print('\tPredict Finished ...')
-        print(self.labels_predict)
         return self.labels_predict
 
     def getAccuracy(self):
