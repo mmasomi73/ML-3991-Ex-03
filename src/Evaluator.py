@@ -114,12 +114,14 @@ class Evaluator:
 
         full_knn_dtw_times = []
         fast_knn_dtw_times = []
+        number_of_ins = []
 
         for i in range(100):
             full_knn_dtw_time = train_size * (test_size * (i + 1) / 100) * sub_total_time / 100
             fast_knn_dtw_time = 1100 * (test_size * (i + 1) / 100) * sub_total_time / 100
             full_knn_dtw_times.append(full_knn_dtw_time)
             fast_knn_dtw_times.append(fast_knn_dtw_time)
+            number_of_ins.append((test_size * (i + 1) / 100))
 
         full_knn_dtw_series = pd.Series(full_knn_dtw_times)
         fast_knn_dtw_series = pd.Series(fast_knn_dtw_times)
@@ -128,8 +130,8 @@ class Evaluator:
 
         plt.figure(figsize=(8, 6))
 
-        plt.plot(full_knn_dtw_series, label="Full KNN DTW")
-        plt.plot(fast_knn_dtw_series, label="Fast KNN DTW")
+        plt.plot(number_of_ins, full_knn_dtw_times, label="Full KNN DTW")
+        plt.plot(number_of_ins, fast_knn_dtw_times, label="Fast KNN DTW")
 
         plt.xlabel(' Number of Test Data', **csfont)
         plt.ylabel('Time (s)', **csfont)
