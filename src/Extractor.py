@@ -11,6 +11,7 @@ class Extractor:
     dc = object
 
     def __init__(self, dc, filter='canny'):
+        print('\t| Extractor Call With Filter: ({})'.format(filter))
         self.dc = dc
         self.filter = filter
 
