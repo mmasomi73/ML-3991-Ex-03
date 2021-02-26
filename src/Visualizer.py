@@ -84,8 +84,8 @@ class Visualizer:
             plt.figure(figsize=(8, 6))
             for j in range(3):
                 plt.plot(sequences_list[i][j+1], label=filters_list[j])
-            plt.xlabel('Pixel Number', **csfont)
-            plt.ylabel('Order', **csfont)
+            plt.xlabel('Order', **csfont)
+            plt.ylabel('Pixel Number', **csfont)
             plt.title('Extracted Sequences for [{}]'.format(i), **csfont)
             plt.legend(loc='upper right')
             plt.savefig('../outs/Seq-Comp-{}.png'.format(str(i)), format='png')
